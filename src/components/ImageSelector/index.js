@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Button, Image, Alert, PermissionsAndroid, Platform } from "react-native";
+import { View, Text, StyleSheet, Button, Image, Platform } from "react-native";
 import { launchCamera } from 'react-native-image-picker';
 import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import { COLORS } from '../../constants';
