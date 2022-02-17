@@ -2,19 +2,20 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Button, Alert } from "react-native";
 import { COLORS } from '../../constants';
 import Geolocation from "@react-native-community/geolocation";
+import MapPreview from "../MapPreview";
 
 const LocationSelector = ({ onLocation }) => {
-    const [pickedLocation, setPickedLocation] = useState();
+    const [pickedLocation, setPickedLocation] = useState('');
 
     const handleGetLocation = async () => {
         Geolocation.getCurrentPosition(
             position => {
                 console.warn(position);
                 const location = {
-                    latitud: position.coords.latitude,
-                    longitud: position.coords.longitude,
-                    latitudDelta: 0.09,
-                    longitudDelta: 0.05
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    latitudeDelta: 0.09,
+                    longitudeDelta: 0.05
                 };
                 setPickedLocation(location);
                 onLocation(location);
@@ -39,12 +40,18 @@ const LocationSelector = ({ onLocation }) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.preview}>
+            {/* <View style={styles.preview}>
                 { pickedLocation ? 
-                    <Text>{pickedLocation.latitud}, {pickedLocation.longitud}</Text> : 
+                    <Text>{pickedLocation.latitude}, {pickedLocation.longitude}</Text> : 
                     <Text>No hay una ubicación seleccionada</Text>
                 }
-            </View>
+            </View> */}
+            <MapPreview 
+                location={pickedLocation}
+                style={styles.preview}
+            >
+                <Text>No hay ubicación seleccionada</Text>
+            </MapPreview>
             <Button title="Seleccionar ubicación" color={COLORS.PEACH_PUFF} onPress={handleGetLocation} />
         </View>
     )
