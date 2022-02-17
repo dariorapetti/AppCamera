@@ -1,61 +1,48 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Button, Image, Alert, PermissionsAndroid } from "react-native";
-import * as ImagePicker from 'react-native-image-picker';
+import { View, Text, StyleSheet, Button, Image, Alert, PermissionsAndroid, Platform } from "react-native";
+import { launchCamera } from 'react-native-image-picker';
+import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import { COLORS } from '../../constants';
 
-const ImageSelector = (props) => {
-    const [pickedUri, setPickedUri] = useState();
+const ImageSelector = ({ onImage }) => {
+    const [pickerResponse, setPickerResponse] = useState();
+    const IS_IOS = Platform.OS === 'ios';
 
-    const verifyPermission = async () => {
-        try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.CAMERA,
-                {
-                    title: 'APP CAMERA - Permisos de cámara',
-                    message: 'APP CAMERA necesita acceso a la cámara',
-                    buttonNeutral: 'Preguntar más tarde',
-                    buttonNegative: 'Cancelar',
-                    buttonPositive: 'Ok'
-                }
-            )
-            return (granted == PermissionsAndroid.RESULTS.GRANTED);
-        } catch (error) {
-            console.warn(error);
-        }
-    };
-    const handleTakeImage = async () => {
-        const isCameraOk = await verifyPermission();
-        if(!isCameraOk) return;
-
+    const handleTakePicture = async () => {
         let options = {
-            storageOptions: {
-                skipBackup: true,
-                path: 'images'
-            }
+            selectionLimit: 1,
+            mediaType: 'photo',
+            includeBase64: false
         }
         
-        const image = await ImagePicker.launchCamera(options, (response) => {
-            if(response.didCancel){
-                console.log('Cancelado por el usuario');
-            } else if(response.error){
-                console.log("ImagePicker error: ", response.error);
-            } else if (response.customButton) {
-                console.log("El usuario ha presionado el botón: ", response.customButton);
-            } else {
-                setPickedUri(response.assets[0].uri);
-                //props.onImage(response.uri);
-            }
-        });
+        let granted;
+
+        if(IS_IOS){
+            granted = await request(PERMISSIONS.IOS.CAMERA);
+        } else {
+            granted = await request(PERMISSIONS.ANDROID.CAMERA);
+        }
+
+        if(granted === RESULTS.GRANTED){
+            launchCamera(options, (res) => {
+                if(!res.didCancel && !res.error){
+                    setPickerResponse(res.assets[0]);
+                    onImage && onImage(res.assets[0].uri);
+                }
+            });
+        } else {
+            console.warn('Permiso denegado!');
+        }
     };
 
     return (
         <View style={styles.container}>
             <View style={styles.preview}>
-                { !pickedUri ? (<Text>No hay una imagen seleccionada</Text>) : (
-                    <Image style={styles.image} source={{uri: pickedUri}} />
+                { !pickerResponse ? (<Text>No hay una imagen seleccionada</Text>) : (
+                    <Image style={styles.image} source={{uri: pickerResponse.uri }} />
                 )}
             </View>
-            <Button title="Tomar foto" color={COLORS.MAROON} onPress={handleTakeImage} />
+            <Button title="Tomar foto" color={COLORS.MAROON} onPress={handleTakePicture} />
         </View>
     )
 }

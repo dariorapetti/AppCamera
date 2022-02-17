@@ -8,16 +8,17 @@ import ImageSelector from '../components/ImageSelector';
 const NewPlaceScreen = ({navigation}) => {
     const dispatch = useDispatch();
     const [title, setTitle] = useState('');
+    const [image, setImage] = useState('');
 
     const handleTitleChange = (text) => setTitle(text);
 
     const handleSave = () => {
-        dispatch(addPlace(title));
+        dispatch(addPlace(title, image));
         navigation.navigate('Direcciones')
     }
 
     const handleOnImage = (uri) => {
-        console.warn(uri);
+        setImage(uri);
     }
 
     return (
