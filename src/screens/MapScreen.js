@@ -3,18 +3,19 @@ import { Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 
-const MapScreen = ({ navigation, route }) => {
+const MapScreen = ({ navigation }) => {
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [initialRegion, setInitialRegion] = useState(null);
 
     useEffect(() => {
         Geolocation.getCurrentPosition(
             position => {
+                const { latitude, longitude } = position.coords;
                 const location = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    latitudeDelta: 0.09,
-                    longitudeDelta: 0.05
+                    latitude: latitude,
+                    longitude: longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421
                 };
                 setInitialRegion(location);
             },
@@ -28,7 +29,7 @@ const MapScreen = ({ navigation, route }) => {
             },
             {
                 enableHighAccuracy: true,
-                timeout: 5000,
+                timeout: 15000,
                 maximumAge: 10000,
                 forceRequestLocation: true,
                 showLocationDialog: true
@@ -62,19 +63,21 @@ const MapScreen = ({ navigation, route }) => {
     }, [navigation, handleSaveLocation]);
 
     return (
-        <MapView 
-            style={styles.container}
-            initialRegion={initialRegion}
-            onPress={handleSelectLocation}
-        >
-            { selectedLocation ? ( 
-                <Marker 
-                    title="Ubicación seleccionada"
-                    coordinate={selectedLocation}
-                />
-            ) : (<Text style={styles.loading}>Cargando...</Text>)}
-        </MapView>
-
+        <>
+        {initialRegion ? (
+            <MapView 
+                style={styles.container}
+                initialRegion={initialRegion}
+                onPress={handleSelectLocation}
+            >
+                { selectedLocation && ( 
+                    <Marker 
+                        title="Ubicación seleccionada"
+                        coordinate={selectedLocation}
+                    />
+                )}
+            </MapView>) : <Text style={styles.loading}>Cargando...</Text> }
+        </>
     )
 }
 
@@ -96,4 +99,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default MapScreen
+export default MapScreen;
