@@ -6,7 +6,7 @@ import { addPlace } from '../store/places.actions';
 import ImageSelector from '../components/ImageSelector';
 import LocationSelector from '../components/LocationSelector';
 
-const NewPlaceScreen = ({navigation}) => {
+const NewPlaceScreen = ({ navigation }) => {
     const dispatch = useDispatch();
     const [title, setTitle] = useState('');
     const [image, setImage] = useState('');
@@ -15,7 +15,7 @@ const NewPlaceScreen = ({navigation}) => {
     const handleTitleChange = (text) => setTitle(text);
 
     const handleSave = () => {
-        dispatch(addPlace(title, image));
+        dispatch(addPlace(title, image, location));
         navigation.navigate('Direcciones')
     }
 
@@ -23,8 +23,14 @@ const NewPlaceScreen = ({navigation}) => {
         setImage(uri);
     }
 
-    const handleOnlocation = (position) => {
+    const handleOnLocation = (position) => {
         setLocation(position);
+    }
+
+    const handleOnMapLocation = () => {        
+        navigation.navigate('Map', {
+            location: location
+        });
     }
 
     return (
@@ -32,7 +38,7 @@ const NewPlaceScreen = ({navigation}) => {
             <View style={styles.container}>
                 <Text style={styles.label}>Título</Text>
                 <ImageSelector onImage={handleOnImage} />
-                <LocationSelector onLocation={handleOnlocation} />
+                <LocationSelector onLocation={handleOnLocation} onMapLocation={handleOnMapLocation} />
                 <TextInput 
                     style={styles.input} 
                     onChangeText={handleTitleChange} 
